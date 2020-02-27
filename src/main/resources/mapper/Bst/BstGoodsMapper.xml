@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  <mapper namespace="com.cy.pj.bst.dao.BstGoodsDao">
+  <!-- 修改商品信息 -->
+  <update id="updateObject"
+            parameterType="com.cy.pj.sys.entity.SysUser">
+        update goods
+        set name=#{name},
+            price=#{price},
+            classId=#{classId},
+            inventory=#{inventory},
+            updateTime=now(),
+            describe=#{describe}
+         where id=#{id}
+    </update>
+    
+    <!-- 添加商品信息 -->
+   <insert id="insertObject" parameterType="com.cy.pj.bst.entity.BstGoods">
+      
+         insert into goods
+         (name,price,classId,inventory,updateTime,describe)
+         values
+         (#{name},#{price},#{classId},#{inventor},#{inventory},#{updateTime},#{describe})
+      </insert>
+  
+  <!-- 删除商品信息 -->
+   <delete id="deleteObjects">
+            delete from goods
+            <choose>
+                <when test="ids!=null and ids.length>0">
+                   <where>
+                       <foreach collection="ids" separator="or" item="id">
+                            id=#{id}
+                       </foreach>
+                   </where>
+                </when>
+                <otherwise>
+                      where 1==2
+                </otherwise>
+            </choose>
+      </delete>
+  
+  
+  <!-- 共同语句 -->
+  <sql id="queryWhereId">
+         from goods
+          <where>
+             <if test="name!=null and name!=''">
+               name like concat("%",#{name},"%")
+             </if>
+          </where>
+      </sql>
+  
+  <!-- 基于条件查询日志表中的记录总数 -->
+      <select id="getRowCount" 
+              resultType="int">
+          select count(*)
+          <!-- 调用共同语句 -->
+          <include refid="queryWhereId"/>
+      </select>
+      
+  <!-- 基于条件查询当前页记录信息 -->
+      <select id="findPageObjects" 
+      resultType="com.cy.pj.Bst.entity.BstGoods">
+          select *
+          <include refid="queryWhereId"/>
+          order by updateTime desc
+          limit #{startIndex},#{pageSize}
+      </select>
+  
+  </mapper>
